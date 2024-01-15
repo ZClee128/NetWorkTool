@@ -29,9 +29,8 @@ private func JSONResponseDataFormatter(_ data: Data) -> String {
 }
 
 private let plugins: [PluginType] = {
-    let activityPlugin = ZCActivityPlugin()
     let netLoggerPlugin = ZCNetWorkLoggerPlugin(configuration: .init(formatter: .init(responseData: JSONResponseDataFormatter), logOptions: [.requestBody, .successResponseBody, .errorResponseBody]))
-    return [netLoggerPlugin, activityPlugin]
+    return [netLoggerPlugin]
 }()
 
 // MARK: - Headers
@@ -62,7 +61,7 @@ let requestTimeoutClosure = { (endpoint: Endpoint, done: @escaping MoyaProvider<
     }
 }
 
-public let provider = MoyaProvider<MultiTarget>(endpointClosure: endpointClosure, requestClosure: requestTimeoutClosure, stubClosure: stubClosure, session: MoyaConfig.apiSession, plugins: plugins)
+public let provider = MoyaProvider<MultiTarget>(endpointClosure: endpointClosure, requestClosure: requestTimeoutClosure, stubClosure: stubClosure, plugins: plugins)
 public let downloadProvider = MoyaProvider<MultiTarget>(plugins: plugins)
 public typealias ZCNetWorkResultBlock<T> = (ZCResult<T, ZCNetworkError>) -> Void
 
