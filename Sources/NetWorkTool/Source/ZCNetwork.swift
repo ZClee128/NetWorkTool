@@ -115,28 +115,24 @@ public class ZCNetwork {
             case .success(let response):
                 do {
                     let decoder = JSONDecoder()
-                    let serverRes = try response.map(ZCResponseModel<T>.self, using: decoder)
-                    if serverRes.status == 0 {
-                        if let model = serverRes.data {
-                            completion?(.success(model))
-                        } else {
-                            print("data数据解析失败")
-                            completion?(.error(ZCNetworkError(errorCode: -1, errorMessage: "data数据解析失败")))
-                        }
-                    } else {
-                        var hcError = ZCNetworkError()
-                        hudMessage = self._errorHandle(code: serverRes.status ?? -1, msg: serverRes.error ?? "")
-                        api.errorCodeProcess(errorMsg: (serverRes.status ?? -1, serverRes.error ?? ""))
-                        if let code = serverRes.status {
-                            hcError.errorCode = code
-                        }
-                        if let message = serverRes.error {
-                            hcError.errorMessage = message
-                        }
-                        completion?(.error(hcError))
-                        let traceId = (response.response?.allHeaderFields["X-Trace-Id"] as? String) ?? ""
-                        print("接口报错>>api>>\(api.path)>> X-Trace-Id: \(traceId) \n\(serverRes.error ?? "")")
-                    }
+                    let serverRes = try response.map(T.self, using: decoder)
+                    completion?(.success(serverRes))
+//                    if serverRes.status == 0 {
+//
+//                    } else {
+//                        var hcError = ZCNetworkError()
+//                        hudMessage = self._errorHandle(code: serverRes.status ?? -1, msg: serverRes.error ?? "")
+//                        api.errorCodeProcess(errorMsg: (serverRes.status ?? -1, serverRes.error ?? ""))
+//                        if let code = serverRes.status {
+//                            hcError.errorCode = code
+//                        }
+//                        if let message = serverRes.error {
+//                            hcError.errorMessage = message
+//                        }
+//                        completion?(.error(hcError))
+//                        let traceId = (response.response?.allHeaderFields["X-Trace-Id"] as? String) ?? ""
+//                        print("接口报错>>api>>\(api.path)>> X-Trace-Id: \(traceId) \n\(serverRes.error ?? "")")
+//                    }
                 } catch {
                     if case let MoyaError.objectMapping(sError, _) = error {
                         let text = "数据解析失败: -> \(api.identifier) -- \(self.decodingErrorDescription(sError)) \n接口响应：\(String(describing: String(data: response.data, encoding: .utf8) ?? response.response?.description))"
